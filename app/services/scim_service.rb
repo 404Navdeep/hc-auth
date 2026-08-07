@@ -17,6 +17,12 @@ module SCIMService
 
       new_slack_id = result[:slack_id]
       current_slack_id = identity.slack_id
+      if new_slack_id.blank?
+        Rails.logger.warn(
+          "Slack reprovision after email change returned blank Slack ID for identity #{identity.public_id}"
+        )
+        return
+      end
 
       if new_slack_id == current_slack_id
         Rails.logger.info(

@@ -279,6 +279,16 @@ RSpec.describe Identity::EmailChangeRequest do
       SCIMService.reprovision_identity_after_primary_email_change(identity:)
       expect(identity.reload.slack_id).to eq("UOLD12345")
     end
+
+    it "keeps existing Slack ID when reprovisioning returns blank Slack ID" do
+      allow(SCIMService).to receive(:find_or_create_user).with(identity:, scenario:).and_return(
+        success: true, slack_id: nil, created: false
+      )
+
+      expect(identity).not_to receive(:update!)
+      SCIMService.reprovision_identity_after_primary_email_change(identity:)
+      expect(identity.reload.slack_id).to eq("UOLD12345")
+    end
   end
 
   describe "#cancel!" do
